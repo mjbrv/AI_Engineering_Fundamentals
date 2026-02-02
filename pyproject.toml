@@ -1,0 +1,26 @@
+[project]
+name = "ai-engineering-fundamentals"
+version = "0.1.0"
+description = "AI Engineering Track - Fundamentals Course"
+requires-python = ">=3.10"
+dependencies = [
+    "IPython",
+    "anthropic",
+    "matplotlib",
+    "numpy",
+    "openai",
+    "python-dotenv",
+    "requests",
+    "seaborn",
+    "tiktoken",
+    "torch",
+    "jupyter",
+    "ipykernel",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = []
