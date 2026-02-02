@@ -1,0 +1,104 @@
+{
+  "notebook": "mini-context.ipynb",
+  "module": "Module 2: LLM Core Concepts",
+  "total_duration": "~30 min",
+  "transcripts": [
+    {
+      "cell_index": 0,
+      "cell_type": "markdown",
+      "section": "Introduction",
+      "transcript": "Hey everyone! Welcome to Context Window Limits - this is a really practical one. Understanding context windows is crucial because, well, you're gonna hit limits. Every model has a maximum number of tokens it can handle, and if you don't plan for it, you'll get errors or truncated outputs. We're going to learn how to budget your context wisely, understand the 'lost in the middle' phenomenon - which is fascinating - and learn strategies for handling content that's too long. Let's get into it!"
+    },
+    {
+      "cell_index": 1,
+      "cell_type": "markdown",
+      "section": "1. Setup",
+      "transcript": "Quick setup with our tokenizer and client."
+    },
+    {
+      "cell_index": 2,
+      "cell_type": "code",
+      "section": "1. Setup",
+      "concepts": ["OpenAI client", "tiktoken", "token counting function"],
+      "transcript": "Standard imports plus tiktoken for counting tokens. I've got a little count_tokens helper function here that we'll use throughout the lab. All set!"
+    },
+    {
+      "cell_index": 3,
+      "cell_type": "markdown",
+      "section": "2. Understanding Context Windows",
+      "transcript": "So what exactly is a context window? It's the maximum number of tokens the model can process in a single request. And here's the thing - it includes everything: your system prompt, the conversation history, the user input, any RAG context you're injecting, AND the generated response. It all has to fit."
+    },
+    {
+      "cell_index": 4,
+      "cell_type": "code",
+      "section": "2. Understanding Context Windows",
+      "concepts": ["context window sizes", "model comparison", "token limits", "pages estimation"],
+      "transcript": "Let's visualize the landscape. This is fascinating - look at the range! Gemini 1.5 Pro and Flash have a million tokens - that's like 2,000 pages of text. Claude 3 models have 200K, about 400 pages. GPT-4o and variants have 128K. And then older models like Llama-3-70b are down at 8K, about 16 pages. The bars really show you the scale difference. This matters because what you can do with a million token context is fundamentally different from 8K tokens."
+    },
+    {
+      "cell_index": 5,
+      "cell_type": "markdown",
+      "section": "3. Context Budget Planning",
+      "transcript": "Now here's the practical skill - budgeting your context. You can't just cram everything in and hope for the best."
+    },
+    {
+      "cell_index": 6,
+      "cell_type": "code",
+      "section": "3. Context Budget Planning",
+      "concepts": ["context budget", "token allocation", "input vs output tokens", "budget planning"],
+      "transcript": "This function breaks down exactly where your tokens are going. For our RAG example: system prompt is 14 tokens, user message is 12, retrieved context is 980, no history in this case. Total input is 1,006 tokens. We're reserving 2,000 for the response. So total needed is 3,006 out of 128,000 available - that's only 2.3% usage. Plenty of headroom! But imagine if that context were 100K tokens - suddenly you're over budget. Always do this math before you hit production."
+    },
+    {
+      "cell_index": 7,
+      "cell_type": "markdown",
+      "section": "4. The 'Lost in the Middle' Problem",
+      "transcript": "Okay, this is one of my favorite topics. There's this research finding that LLMs actually pay less attention to information in the middle of long contexts. They're better at remembering stuff at the beginning and end. Let's test this."
+    },
+    {
+      "cell_index": 8,
+      "cell_type": "code",
+      "section": "4. The 'Lost in the Middle' Problem",
+      "concepts": ["lost in the middle phenomenon", "attention patterns", "information placement", "document structure"],
+      "transcript": "So I've created one document with three secret codes: one at the start, one in the middle buried in a bunch of filler text, and one at the end. We're using real AI Engineering documents as filler - 60 documents, about 15,000 tokens total. Then we ask GPT-3.5 to find each code. And look at the results - in this case, it found all three! But this is a controlled test. In practice, with more complex queries and longer contexts, the middle information often gets missed. The takeaway is: put your most important information at the beginning or end of your context, not buried in the middle."
+    },
+    {
+      "cell_index": 9,
+      "cell_type": "markdown",
+      "section": "5. Strategies for Long Content",
+      "transcript": "What do you do when your content is just too long? You can't always use models with massive context windows. Let's look at strategies."
+    },
+    {
+      "cell_index": 10,
+      "cell_type": "code",
+      "section": "5. Strategies for Long Content",
+      "concepts": ["text chunking", "overlap strategy", "chunk continuity", "document splitting"],
+      "transcript": "First strategy: chunking with overlap. This function splits text into chunks of a specified token size, but crucially, it overlaps them. Why overlap? Because you don't want to cut a sentence or idea in half. The overlap maintains continuity between chunks. Look at our 2,400 token document - we get 6 chunks of 500 tokens each, with 50-token overlaps. The position ranges show how they overlap. This is the foundation of RAG systems."
+    },
+    {
+      "cell_index": 11,
+      "cell_type": "code",
+      "section": "5. Strategies for Long Content",
+      "concepts": ["map-reduce pattern", "extract-then-synthesize", "multi-step processing", "context aggregation"],
+      "transcript": "Second strategy: extract-then-synthesize. We chunk the document, then ask the model to extract only relevant sentences from each chunk, then combine and answer. Watch this - we process 2 chunks, both have relevant content, and we get a final answer about transformers being introduced in 2017 and enabling parallel processing. This map-reduce pattern is powerful for long documents."
+    },
+    {
+      "cell_index": 12,
+      "cell_type": "markdown",
+      "section": "Advanced Topic: Context Manager Class",
+      "transcript": "There's also the concept of a Context Manager - a utility class that helps manage all this automatically. It handles token counting, budget allocation, smart truncation. We won't implement it fully here, but it's something you'd build for production systems."
+    },
+    {
+      "cell_index": 13,
+      "cell_type": "code",
+      "section": "Advanced Topic: Context Manager Class",
+      "concepts": ["production systems", "advanced topics"],
+      "transcript": "Just a note that Context Manager implementation gets covered in more advanced courses on RAG and production LLM apps. For now, knowing the concepts is what matters."
+    },
+    {
+      "cell_index": 14,
+      "cell_type": "markdown",
+      "section": "Summary",
+      "transcript": "Alright, key takeaways! Context window includes everything - system, history, user input, context, and response. Different models have vastly different limits, from 8K to a million tokens. Always plan your token budget and leave room for the response. The 'lost in the middle' problem is real - place important information strategically. And for long content, use chunking with overlap or extract-then-synthesize patterns. Up next, check out mini-temperature for generation parameters and mini-sampling for Top-K and Top-P. Great work today!"
+    }
+  ]
+}

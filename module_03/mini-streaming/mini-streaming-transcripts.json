@@ -1,0 +1,124 @@
+{
+  "notebook": "mini-streaming.ipynb",
+  "module": "Module 2: LLM Core Concepts",
+  "total_duration": "~20 min",
+  "transcripts": [
+    {
+      "cell_index": 0,
+      "cell_type": "markdown",
+      "section": "Introduction",
+      "transcript": "Alright, welcome to the Streaming Responses mini-lab! So you've probably noticed that when you use ChatGPT, the text appears word by word, right? That's streaming. And it's not just a cool effect - it's actually super practical. It makes your apps feel way more responsive because users see output immediately instead of waiting for the whole response. Plus, you can stop early if something's going wrong. Today we're gonna implement streaming ourselves and see all the cool things you can do with it. Let's dive in!"
+    },
+    {
+      "cell_index": 1,
+      "cell_type": "markdown",
+      "section": "1. Setup",
+      "transcript": "Quick setup as always."
+    },
+    {
+      "cell_index": 2,
+      "cell_type": "code",
+      "section": "1. Setup",
+      "concepts": ["OpenAI client", "time module", "display utilities"],
+      "transcript": "Standard imports - OpenAI client, time for measuring latency, and the display utilities for Jupyter. All set!"
+    },
+    {
+      "cell_index": 3,
+      "cell_type": "markdown",
+      "section": "2. Non-Streaming vs Streaming Comparison",
+      "transcript": "Let's start by actually measuring the difference. Numbers don't lie, right?"
+    },
+    {
+      "cell_index": 4,
+      "cell_type": "code",
+      "section": "2. Non-Streaming vs Streaming Comparison",
+      "concepts": ["latency comparison", "time to first token", "perceived latency", "streaming benefits"],
+      "transcript": "Okay this is really cool - watch these numbers! Non-streaming: time to first character is 1.71 seconds. You wait that whole time seeing nothing. Streaming: time to first character is only 0.31 seconds! That's 82% faster for the user to see something! The total time is actually similar - 1.71 versus 1.51 seconds - but the perceived experience is completely different. This is why streaming matters so much for user experience. Nobody likes staring at a blank screen."
+    },
+    {
+      "cell_index": 5,
+      "cell_type": "markdown",
+      "section": "3. Basic Streaming Implementation",
+      "transcript": "Let's see how to actually implement this in code."
+    },
+    {
+      "cell_index": 6,
+      "cell_type": "code",
+      "section": "3. Basic Streaming Implementation",
+      "concepts": ["stream parameter", "chunk iteration", "delta content", "real-time display"],
+      "transcript": "Here's the basic pattern. You set stream=True in your API call, then iterate over the chunks as they come in. Each chunk has a delta - that's the partial content, usually just a few tokens. You access it via chunk.choices[0].delta.content. In this example, I'm using clear_output with markdown rendering to get that nice live update effect in Jupyter. When you run it, you see the list building up in real-time. Pretty slick, right?"
+    },
+    {
+      "cell_index": 7,
+      "cell_type": "markdown",
+      "section": "4. Interactive Streaming with Live Updates",
+      "transcript": "Now let's make it prettier with live markdown rendering."
+    },
+    {
+      "cell_index": 8,
+      "cell_type": "code",
+      "section": "4. Interactive Streaming with Live Updates",
+      "concepts": ["live markdown rendering", "cursor animation", "clear_output", "user experience"],
+      "transcript": "This version renders markdown as it comes in, so you see formatted text with headers, bold, lists - all appearing live. I've added that little cursor character at the end during streaming to show it's still thinking, then remove it when done. It's these little touches that make your apps feel polished and professional."
+    },
+    {
+      "cell_index": 9,
+      "cell_type": "markdown",
+      "section": "5. Processing Streamed Content",
+      "transcript": "Streaming isn't just about display - you can process tokens as they arrive. Let's look at some practical patterns."
+    },
+    {
+      "cell_index": 10,
+      "cell_type": "code",
+      "section": "5. Processing Streamed Content",
+      "concepts": ["word detection", "real-time processing", "watch words", "content monitoring"],
+      "transcript": "Here's something useful - detecting specific words as they stream in. We're asking about neural networks and watching for key terms like 'neural', 'deep', 'learning', 'training', 'model'. As each chunk arrives, we check if any watch words appeared. Look at the output - 'neural' found after just the first couple of chunks, then 'deep', 'learning'... and eventually all 5 watch words are detected. This pattern is great for content moderation, keyword extraction, or triggering actions based on what the model says."
+    },
+    {
+      "cell_index": 11,
+      "cell_type": "code",
+      "section": "5. Processing Streamed Content",
+      "concepts": ["early stopping", "stream termination", "efficiency", "stop conditions"],
+      "transcript": "And here's early stopping - we're counting from 1 to 20, but we want to stop when we see '10'. Watch this... it's counting, 1, 2, 3... and boom, stopped at 10! We break out of the loop as soon as we detect our stop phrase. This saves API costs - you're not paying for tokens you don't need. Super useful for extraction tasks where you only need the first answer, or for safety checks where you want to abort if something's wrong."
+    },
+    {
+      "cell_index": 12,
+      "cell_type": "markdown",
+      "section": "6. Token Counting During Streaming",
+      "transcript": "Let's look at how to get statistics from streaming responses."
+    },
+    {
+      "cell_index": 13,
+      "cell_type": "code",
+      "section": "6. Token Counting During Streaming",
+      "concepts": ["stream statistics", "token counting", "usage tracking", "tokens per second", "stream_options"],
+      "transcript": "Here's the secret sauce - set stream_options with include_usage true, and you get token counts in the final chunk. This poem about coding generates beautifully, and then look at these stats: 132 chunks received, time to first token was half a second, 129 completion tokens, running at about 52 tokens per second. The usage info is crucial for cost tracking in production. You can log this, aggregate it, and know exactly what you're spending."
+    },
+    {
+      "cell_index": 14,
+      "cell_type": "markdown",
+      "section": "7. Building a Chat Interface with Streaming",
+      "transcript": "Let's put it all together with a streaming chat interface."
+    },
+    {
+      "cell_index": 15,
+      "cell_type": "code",
+      "section": "7. Building a Chat Interface with Streaming",
+      "concepts": ["chat interface", "conversation history", "streaming chat", "stateful conversation", "display handle"],
+      "transcript": "This StreamingChat class maintains conversation history and streams each response. I'm using a display handle so we can update just the response area without clearing other output. We ask 'What is a function in programming?' - response streams in. Then 'Can you show a simple example in Python?' - and it remembers the context and gives a relevant example. This is the foundation of how you'd build a real chatbot with streaming."
+    },
+    {
+      "cell_index": 16,
+      "cell_type": "code",
+      "section": "7. Building a Chat Interface with Streaming",
+      "concepts": ["multi-turn conversation", "context persistence"],
+      "transcript": "And continuing the conversation - 'What about functions with parameters?' It builds on what we discussed before, giving a coherent multi-turn experience. The streaming makes it feel like a real conversation instead of waiting for walls of text."
+    },
+    {
+      "cell_index": 17,
+      "cell_type": "markdown",
+      "section": "Summary",
+      "transcript": "Alright, wrapping up! Streaming gives you faster perceived response time, better UX, and the ability to process and stop early. Implementation is just stream=True, then iterate over chunks, accessing content via delta. Common patterns include live rendering, word detection, early termination, and token counting with stream_options. Best practices: always use flush=True when printing, handle None content in chunks, and track both chunks and content separately. From here, check out mini-model-compare to see streaming across different models, and the main LLM playground lab to combine all these concepts. Nice work!"
+    }
+  ]
+}
