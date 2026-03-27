@@ -16,6 +16,7 @@ dependencies = [
     "torch",
     "jupyter",
     "ipykernel",
+    "chromadb>=1.5.5",
 ]
 
 [build-system]
