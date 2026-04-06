@@ -19,6 +19,8 @@ dependencies = [
     "chromadb>=1.5.5",
     "gradio>=6.10.0",
     "markdown>=3.10.2",
+    "rouge-score",
+    "nltk",
 ]
 
 [build-system]
